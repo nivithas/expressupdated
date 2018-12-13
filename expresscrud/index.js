@@ -2,10 +2,12 @@ var express = require('express')
 var mongoose = require('mongoose')
 var userModel = require('./model/user')
 var bodyParser = require('body-parser')
+var cors = require('cors')
 
 var app = express()
 app.use(bodyParser.urlencoded({extended:false}))
 app.use(bodyParser.json())
+app.use(cors())
 mongoose.connect("mongodb://localhost:27017/newdb")
 var db = mongoose.connection
 db.on('error',function(){
@@ -42,4 +44,20 @@ app.get('/get/:location',function(req,res){
         }
     })
 })
+
+app.post('/add',function(req,res){
+    var um = new userModel()
+    um.name = req.body.name
+    um.location = req.body.location
+    um.year = req.body.year
+    um.save(function(err){
+        if(err){
+            res.send(err)
+        }
+        else{
+            res.json({message: 'user created'})
+        }
+    })
+})
+
 app.listen(8888)
